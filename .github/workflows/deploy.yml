@@ -1,0 +1,38 @@
+name: Deploy Terraform
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  apply-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: echo '${{ secrets.GCP_SA_KEY }}' > key.json
+
+      - run: terraform init
+        working-directory: envs/dev
+
+      - run: terraform apply -auto-approve -var-file=dev.tfvars
+        working-directory: envs/dev
+
+  apply-prod:
+    needs: apply-dev
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: echo '${{ secrets.GCP_SA_KEY }}' > key.json
+
+      - run: terraform init
+        working-directory: envs/prod
+
+      - run: terraform apply -auto-approve -var-file=prod.tfvars
+        working-directory: envs/prod

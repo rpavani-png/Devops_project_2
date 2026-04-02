@@ -1,0 +1,5 @@
+project_id  = "your-project-id"
+region      = "us-east1"
+zone        = "us-east1-b"
+subnet_cidr = "10.1.1.0/24"
+env         = "prod"

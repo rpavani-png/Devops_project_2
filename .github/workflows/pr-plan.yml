@@ -1,0 +1,24 @@
+name: PR Terraform Plan
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [dev, prod]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: echo '${{ secrets.GCP_SA_KEY }}' > key.json
+
+      - run: terraform init
+        working-directory: envs/${{ matrix.env }}
+
+      - run: terraform plan -var-file=${{ matrix.env }}.tfvars
+        working-directory: envs/${{ matrix.env }}
