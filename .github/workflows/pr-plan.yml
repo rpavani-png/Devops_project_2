@@ -15,10 +15,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
 
-      - run: echo '${{ secrets.GCP_SA_KEY }}' > key.json
+      - name: Authenticate GCP
+        run: |
+          echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=key.json" >> $GITHUB_ENV
 
-      - run: terraform init
+      - name: Terraform Init
+        run: terraform init
         working-directory: envs/${{ matrix.env }}
 
-      - run: terraform plan -var-file=${{ matrix.env }}.tfvars
+      - name: Terraform Plan
+        run: terraform plan \
+             -var="project_id=${{ secrets.MY_GCP_PROJECT }}" \
+             -var-file=${{ matrix.env }}.tfvars
         working-directory: envs/${{ matrix.env }}
