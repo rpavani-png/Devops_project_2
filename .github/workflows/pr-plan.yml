@@ -17,10 +17,14 @@ jobs:
 
       - name: Authenticate GCP
         run: |
-          echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
-          echo "GOOGLE_CREDENTIALS=${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}" >> $GITHUB_ENV
+            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
 
+            echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
+
+            echo "GOOGLE_CREDENTIALS<<EOF" >> $GITHUB_ENV
+            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+            
       - name: Terraform Init
         run: terraform init
         working-directory: envs/${{ matrix.env }}
