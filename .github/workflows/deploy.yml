@@ -17,10 +17,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Authenticate to GCP
+      - name: Authenticate GCP
         run: |
-          echo "${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}" > key.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
+            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
+            echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
 
       - name: Set Terraform Variables
         run: echo "TF_VAR_project_id=${{ secrets.MY_GCP_PROJECT }}" >> $GITHUB_ENV
@@ -49,10 +49,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Authenticate to GCP
+      - name: Authenticate GCP
         run: |
-          echo "${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}" > key.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
+            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
+            echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
 
       - name: Set Terraform Variables
         run: echo "TF_VAR_project_id=${{ secrets.MY_GCP_PROJECT }}" >> $GITHUB_ENV

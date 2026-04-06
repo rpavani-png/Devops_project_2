@@ -21,10 +21,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Authenticate to GCP
+      - name: Authenticate GCP
         run: |
-          echo "${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}" > key.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
+            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
+            echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
 
       - name: Terraform Init
         working-directory: envs/${{ matrix.env }}
