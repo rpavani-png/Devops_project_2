@@ -34,13 +34,13 @@ jobs:
         run: terraform apply -auto-approve -var-file=dev.tfvars
 
   apply-prod:
-    name: Apply Prod (Manual Approval Required)
+    name: Apply Prod
     needs: apply-dev
     runs-on: ubuntu-latest
 
     # 🔥 THIS ENABLES APPROVAL GATE
     environment:
-      name: production
+      name: PROD
 
     steps:
       - name: Checkout Code
