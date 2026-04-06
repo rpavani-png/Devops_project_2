@@ -2,30 +2,37 @@ name: PR Terraform Plan
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   plan:
+    name: Terraform Plan (Dev & Prod)
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         env: [dev, prod]
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Authenticate GCP
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Authenticate to GCP
         run: |
-            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
-            echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
+          echo "${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}" > key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
 
       - name: Terraform Init
-        run: terraform init
         working-directory: envs/${{ matrix.env }}
+        run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan \
-             -var="project_id=${{ secrets.MY_GCP_PROJECT }}" \
-             -var-file=${{ matrix.env }}.tfvars
         working-directory: envs/${{ matrix.env }}
+        run: |
+          terraform plan \
+            -var="project_id=${{ secrets.MY_GCP_PROJECT }}" \
+            -var-file=${{ matrix.env }}.tfvars

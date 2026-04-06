@@ -2,53 +2,65 @@ name: Deploy Terraform
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   apply-dev:
+    name: Apply Dev
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Authenticate GCP
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Authenticate to GCP
         run: |
-            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
-            echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
+          echo "${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}" > key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
 
       - name: Set Terraform Variables
         run: echo "TF_VAR_project_id=${{ secrets.MY_GCP_PROJECT }}" >> $GITHUB_ENV
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Terraform Init (Dev)
         working-directory: envs/dev
+        run: terraform init
 
       - name: Terraform Apply (Dev)
-        run: terraform apply -auto-approve -var-file=dev.tfvars
         working-directory: envs/dev
+        run: terraform apply -auto-approve -var-file=dev.tfvars
 
   apply-prod:
+    name: Apply Prod (Manual Approval Required)
     needs: apply-dev
     runs-on: ubuntu-latest
-    environment: production
+
+    # 🔥 THIS ENABLES APPROVAL GATE
+    environment:
+      name: production
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Authenticate GCP
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Authenticate to GCP
         run: |
-            echo '${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}' > key.json
-            echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
-            
+          echo "${{ secrets.MY_SERVICE_ACCOUNT_CREDENTIALS }}" > key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json" >> $GITHUB_ENV
+
       - name: Set Terraform Variables
         run: echo "TF_VAR_project_id=${{ secrets.MY_GCP_PROJECT }}" >> $GITHUB_ENV
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Terraform Init (Prod)
         working-directory: envs/prod
+        run: terraform init
 
       - name: Terraform Apply (Prod)
-        run: terraform apply -auto-approve -var-file=prod.tfvars
         working-directory: envs/prod
+        run: terraform apply -auto-approve -var-file=prod.tfvars
